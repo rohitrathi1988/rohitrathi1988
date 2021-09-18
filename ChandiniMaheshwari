@@ -1,0 +1,276 @@
+CODE->
+
+package gameoflife;
+//Declare class
+public class Board 
+{
+      int[][] board;      //Array Initialisation
+      
+      //Parameterized Constructor 
+      Board(int rows,int columns)    
+      {
+          board=new int[rows][columns];
+      }
+      
+      //get method returns the value stored at specified row,col position
+      public int get(int row,int col)
+      {
+          return board[row][col];
+      }
+      
+      //set method set the specified row,col location to the specified value
+      public void set(int row,int col,int value)
+      {
+           board[row][col]=value;
+      }
+      
+      //getRows method returns the number of rows
+      public int getRows()
+      {
+          return board.length;
+      }
+      
+      //getColumns returns the number of columns
+      public int getColumns()
+      {
+          return board[0].length;
+      }
+      
+      //toString() returns a String that can be printed in display 
+  @Override
+   public String toString()
+      {
+          String result="";
+          for(int i=0;i<getRows();i++)
+          {
+              for(int j=0;j<getColumns();j++)
+              {
+                  result+=board[i][j];
+              }
+          }
+          return result;
+      } 
+}
+
+
+
+package gameoflife;
+//import Scanner class from util package
+import java.util.Scanner;
+
+public class GameOfLife 
+{
+    //declare static variables
+    static int rows,columns;
+    
+    //initializeBoard method setup with a initial board with a random set of cells
+    public static void initializeBoard(Board board)
+    {
+        System.out.println("\n\t"+"______________Initialize The Board_________________");
+        for(int i=0;i<rows;i++)
+        {
+            for(int j=0;j<columns;j++)
+            {
+                int value=(int)(Math.random()*3);
+                if(value==0)
+                {
+                    board.set(i,j,1);
+                }
+            }
+         }
+      }
+    
+    //displayBoard method display the board in the screen
+    public static void displayBoard(Board board)
+    {
+       System.out.println("\n\t_______________________________________");
+       for(int i=0;i<rows;i++)
+        {
+            for(int j=0;j<columns;j++)
+            {
+                if(board.get(i,j)==0)
+                {
+                    System.out.print("\tDead"+",");
+                }
+                else if(board.get(i,j)==1)
+                {
+                    System.out.print("\tLive"+",");
+                }
+            }
+          System.out.println("");
+        }
+      System.out.println("\t_______________________________________");
+    }
+    
+    //getCountNeighbours counts the cells around a given cell
+    public static int getCountNeighbours(int row,int col,Board board)
+    {
+        int count_neighbour=0;
+        for(int i=row-1;i<=row+1;i++)
+        {
+            for(int j=col-1;j<=col+1;j++)
+            {
+                if(i>=0 && i<rows && j>=0 && j<columns && !(i==row && j==col) && board.get(i,j)==1)
+                {
+                    count_neighbour++;
+                }
+            }
+        }
+       return count_neighbour;
+    }
+    
+    /*nextGenerationBoard method takes current board and new board and represents the 
+      next generation for that next board based on rules of "Conway game Of Life"
+    1. Any live cell with fewer than two live neighbours dies, as if by loneliness.
+    2. Any live cell with more than three live neighbours dies, as if by overcrowding.
+    3. Any live cell with two or three live neighbours lives, unchanged, to the next generation.
+    4. Any dead cell with exactly three live neighbours comes to life.
+
+    */
+    public static void nextGenerationBoard(Board board,Board next_board)
+    {
+        for(int i=0;i<rows;i++)
+        {
+            for(int j=0;j<columns;j++)
+            {
+                 if(board.get(i,j)==1 && getCountNeighbours(i,j,board)<2)
+                 {
+                     next_board.set(i,j,0);
+                 } 
+                 else if(board.get(i,j)==1 && (getCountNeighbours(i,j,board)==2 || getCountNeighbours(i,j,board)==3) )
+                 {
+                     next_board.set(i,j,1);
+                 }
+                 else if(board.get(i,j)==1 && getCountNeighbours(i,j,board)>3)
+                 {
+                     next_board.set(i,j,0);
+                 }
+                 else if(board.get(i,j)==0 && getCountNeighbours(i,j,board)==3)
+                 {
+                     next_board.set(i,j,1);
+                 }
+                 else
+                 {
+                     next_board.set(i,j,0);
+                 }
+            }
+        }
+    }
+    
+    /*printBoard method takes the board with next generation and copy to the board 
+      for this generation so that we can continue displaying generations
+    */
+    
+    public static void printBoard(Board board,Board next_board)
+    {
+         for(int i=0;i<rows;i++)
+         {
+             for(int j=0;j<columns;j++)
+             {
+                 board.set(i,j,next_board.get(i,j));
+             }
+         }
+    }
+    
+    public static void main(String[] args) 
+    {
+      System.out.print("\n\t"+"**************************************");
+      System.out.print("\n\t"+"*****DISPLAY CONWAY GAME OF LIFE *****");
+      System.out.println("\n\t"+"**************************************");
+      
+      //Scanner is a class ,s is object of Scanner class ,used for taking input throgh keyboard
+      Scanner s=new Scanner(System.in);
+      //For taking Input how many rows and how many columns
+      System.out.print("\n\t"+"Enter Number Of Rows ");
+      rows=s.nextInt();
+      System.out.print("\n\t"+"Enter Number Of Columns ");
+      columns=s.nextInt();
+      //Create 2 objects of Board Class
+      Board board=new Board(rows,columns);
+      Board nextboard=new Board(rows,columns);
+      initializeBoard(board);
+      
+      System.out.print("\n\t"+"*****DISPLAY BOARD*****");
+      for(int i=0;i<rows;i++)
+      {
+          //Call All Methods
+          displayBoard(board);
+          nextGenerationBoard(board,nextboard);
+          System.out.print("\n\t"+"FOR DEAD AND LIVE CELL"+"\n\t"+"*****PRINT BOARD*****");          printBoard(board,nextboard);
+      }
+   }//main()
+ }//class
+
+OUTPUT->
+           **************************************
+	*****DISPLAY CONWAY GAME OF LIFE *****
+	**************************************
+
+	Enter Number Of Rows 6
+
+	Enter Number Of Columns 6
+
+	______________Initialize The Board_________________
+
+	*****DISPLAY BOARD*****
+	_______________________________________
+	Live,	Dead,	Live,	Dead,	Dead,	Dead,
+	Dead,	Live,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Live,	Dead,	Dead,	Live,
+	Dead,	Dead,	Dead,	Dead,	Live,	Live,
+	Live,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Live,	Dead,	Live,
+	_______________________________________
+           FOR DEAD AND LIVE CELL
+	*****PRINT BOARD*****
+	_______________________________________
+	Dead,	Live,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Live,	Dead,	Dead,	Dead,
+	Dead,	Live,	Dead,	Dead,	Live,	Live,
+	Dead,	Live,	Dead,	Dead,	Live,	Live,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Live,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	______________________________________
+           FOR DEAD AND LIVE CELL
+	*****PRINT BOARD*****
+	_______________________________________
+	Dead,	Live,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Live,	Dead,	Dead,	Dead,
+	Live,	Live,	Live,	Live,	Live,	Live,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Live,	Live,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	_______________________________________
+
+	FOR DEAD AND LIVE CELL
+	*****PRINT BOARD*****
+	_______________________________________
+	Dead,	Live,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Dead,	Dead,	Live,	Dead,
+	Live,	Dead,	Live,	Live,	Live,	Dead,
+	Dead,	Live,	Live,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	_______________________________________
+
+	FOR DEAD AND LIVE CELL
+	*****PRINT BOARD*****
+	_______________________________________
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Live,	Dead,	Live,	Dead,
+	Live,	Dead,	Live,	Dead,	Live,	Dead,
+	Dead,	Live,	Live,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	_______________________________________
+
+	FOR DEAD AND LIVE CELL
+	*****PRINT BOARD*****
+	_______________________________________
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Live,	Dead,	Live,	Dead,	Dead,	Dead,
+	Dead,	Live,	Live,	Live,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	Dead,	Dead,	Dead,	Dead,	Dead,	Dead,
+	_______________________________________
